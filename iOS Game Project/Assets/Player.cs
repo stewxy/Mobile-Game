@@ -11,6 +11,9 @@ public class Player : MonoBehaviour
     //Difference between positions from current frame and next frame
     private Vector3 moveDelta;
 
+    //For collision detection
+    private RaycastHit2D hit;
+
     //Function called on start
     private void Start()
     {
@@ -38,7 +41,21 @@ public class Player : MonoBehaviour
         else if (moveDelta.x < 0)
             transform.localScale = new Vector3(-1, 1, 1);
 
-        //Make player move (* Time.deltaTime makes movement equal on slower and faster devices)
-        transform.Translate(moveDelta * Time.deltaTime);
+        //Check if player can move in y axis by casting a box. If box returns null, player can move
+        hit = Physics2D.BoxCast(transform.position, boxCollider.size, 0, new Vector2(0, moveDelta.y), Mathf.Abs(moveDelta.y * Time.deltaTime), LayerMask.GetMask("Actor", "Blocking"));
+        if(hit.collider == null)
+        {
+            //Make player move (* Time.deltaTime makes movement equal on slower and faster devices)
+            transform.Translate(0, moveDelta.y * Time.deltaTime, 0);
+        }
+
+        //Check if player can move in x axis by casting a box. If box returns null, player can move
+        hit = Physics2D.BoxCast(transform.position, boxCollider.size, 0, new Vector2(moveDelta.x, 0), Mathf.Abs(moveDelta.x * Time.deltaTime), LayerMask.GetMask("Actor", "Blocking"));
+        if (hit.collider == null)
+        {
+            //Make player move (* Time.deltaTime makes movement equal on slower and faster devices)
+            transform.Translate(moveDelta.x * Time.deltaTime,0,  0);
+        }
+
     }
 }
